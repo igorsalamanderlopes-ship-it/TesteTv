@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Teste CORS Apps Script</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #111; color: #eee; }
+  h1 { font-size: 20px; }
+  button { padding: 10px 16px; font-size: 14px; cursor: pointer; }
+  #resultado { margin-top: 20px; padding: 16px; background: #1e1e1e; border-radius: 6px; white-space: pre-wrap; word-break: break-all; font-size: 13px; max-height: 400px; overflow-y: auto; }
+  .ok { color: #6ee7b7; }
+  .erro { color: #fca5a5; }
+</style>
+</head>
+<body>
+
+<h1>Teste de acesso ao Apps Script via fetch</h1>
+<p>Este teste roda a partir do domínio onde este arquivo estiver hospedado (ex: github.io), simulando o que o PWA real vai enfrentar ao buscar os dados.</p>
+
+<button onclick="testar()">Testar acesso ao endpoint</button>
+
+<div id="resultado">Aguardando teste...</div>
+
+<script>
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwv2DKLWAb_17wPXkmoTI13egV89CcKLU6jkCNX-bAbJZKgV0kLorqwgfyiAhoEbOVL/exec";
+
+async function testar() {
+  const div = document.getElementById('resultado');
+  div.className = '';
+  div.textContent = 'Testando, aguarde...';
+
+  try {
+    const resposta = await fetch(URL_APPS_SCRIPT, { mode: 'cors' });
+    const texto = await resposta.text();
+
+    let corpoFormatado = texto;
+    try {
+      const json = JSON.parse(texto);
+      corpoFormatado = JSON.stringify(json, null, 2).slice(0, 2000);
+      if (JSON.stringify(json).length > 2000) corpoFormatado += '\n... (cortado para exibição)';
+    } catch (e) {
+      corpoFormatado = texto.slice(0, 2000);
+    }
+
+    div.className = 'ok';
+    div.textContent =
+      'Requisição concluída sem erro de CORS.\n\n' +
+      'Status: ' + resposta.status + '\n\n' +
+      'Corpo da resposta:\n' + corpoFormatado;
+
+  } catch (erro) {
+    div.className = 'erro';
+    div.textContent =
+      'Falha na requisição (bloqueio de CORS ou implantação incorreta):\n\n' +
+      erro.toString() +
+      '\n\nVerifique se a implantação está com acesso "Qualquer pessoa" e se a URL termina em /exec.';
+  }
+}
+</script>
+
+</body>
+</html>
