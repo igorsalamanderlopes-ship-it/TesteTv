@@ -251,7 +251,7 @@
   </div>
 
   <div class="tabela-box">
-    <h2>Casos de hoje e futuros</h2>
+    <h2>Próximos Casos</h2>
     <table>
       <thead>
         <tr>
@@ -358,6 +358,18 @@ function formatarHoraCurta(valor) {
 
 /* ------------------------------ Processamento --------------------------- */
 
+function adicionarDias(base, dias) {
+  const d = new Date(base);
+  d.setDate(d.getDate() + dias);
+  return d;
+}
+
+function minutosDaHora(valor) {
+  const m = String(valor).match(/^(\d{2}):(\d{2})/);
+  if (!m) return null;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+}
+
 function agruparPorCaso(dados) {
   const grupos = new Map();
 
@@ -384,43 +396,60 @@ function agruparPorCaso(dados) {
   return Array.from(grupos.values());
 }
 
-function processarDados(dados) {
-  const grupos = agruparPorCaso(dados);
+function processarDados(grupos, totalRegistros) {
   const hoje = chaveDia(new Date());
 
   const casosUnicos = grupos.length;
-  const registrosDuplicados = dados.length;
+  const registrosDuplicados = totalRegistros;
   const casosHoje = grupos.filter(function (g) { return chaveDia(g.dataViagem) === hoje; }).length;
-  const anoMesAtual = hoje.slice(0, 7);
-  const casosMes = grupos.filter(function (g) {
-    const chave = chaveDia(g.dataViagem);
-    return chave && chave.slice(0, 7) === anoMesAtual && chave <= hoje;
-  }).length;
 
   const porOrigem = contarPorCampo(grupos, 'origem').slice(0, 5);
   const porTipo = contarPorCampo(grupos, 'tipoGratuidade').slice(0, 5);
   const porLinha = contarPorCampo(grupos, 'linha').slice(0, 5);
-  const porDia = contarPorDia(grupos);
+  const porDia = gerarSerieSeteDias(grupos);
 
-  const tabela = grupos
-    .filter(function (g) { const chave = chaveDia(g.dataViagem); return chave && chave >= hoje; })
-    .sort(function (a, b) {
-      if (b.qtd !== a.qtd) return b.qtd - a.qtd;
-      return new Date(b.dataViagem) - new Date(a.dataViagem);
-    })
-    .slice(0, 8);
+  const tabela = calcularProximosCasos(grupos);
 
   return {
     casosUnicos: casosUnicos,
     registrosDuplicados: registrosDuplicados,
     casosHoje: casosHoje,
-    casosMes: casosMes,
     porOrigem: porOrigem,
     porTipo: porTipo,
     porLinha: porLinha,
     porDia: porDia,
     tabela: tabela
   };
+}
+
+// Casos de hoje em diante (janela de 7 dias), removendo os de hoje cujo
+// horário de saída já passou, sempre ordenados pelo próximo dia/horário.
+function calcularProximosCasos(grupos) {
+  const agora = new Date();
+  const hojeChave = chaveDia(agora);
+  const limiteChave = chaveDia(adicionarDias(agora, 6));
+  const agoraMinutos = agora.getHours() * 60 + agora.getMinutes();
+
+  return grupos
+    .filter(function (g) {
+      const chave = chaveDia(g.dataViagem);
+      if (!chave || chave < hojeChave || chave > limiteChave) return false;
+      if (chave === hojeChave) {
+        const minutosHora = minutosDaHora(g.horaViagem);
+        if (minutosHora === null) return true;
+        return minutosHora >= agoraMinutos;
+      }
+      return true;
+    })
+    .sort(function (a, b) {
+      const chaveA = chaveDia(a.dataViagem);
+      const chaveB = chaveDia(b.dataViagem);
+      if (chaveA !== chaveB) return chaveA < chaveB ? -1 : 1;
+      const minutosA = minutosDaHora(a.horaViagem) || 0;
+      const minutosB = minutosDaHora(b.horaViagem) || 0;
+      return minutosA - minutosB;
+    })
+    .slice(0, 8);
 }
 
 function contarPorCampo(grupos, campoNome) {
@@ -445,17 +474,20 @@ function somarPorCampo(grupos, campoNome) {
     .sort(function (a, b) { return b.total - a.total; });
 }
 
-function contarPorDia(grupos) {
+function gerarSerieSeteDias(grupos) {
   const contagem = new Map();
   grupos.forEach(function (g) {
     const chave = chaveDia(g.dataViagem);
-    if (!chave) return;
-    contagem.set(chave, (contagem.get(chave) || 0) + 1);
+    if (chave) contagem.set(chave, (contagem.get(chave) || 0) + 1);
   });
-  return Array.from(contagem.entries())
-    .sort(function (a, b) { return a[0].localeCompare(b[0]); })
-    .slice(-14)
-    .map(function (par) { return { dia: par[0], total: par[1] }; });
+
+  const serie = [];
+  for (let i = 0; i < 7; i++) {
+    const d = adicionarDias(new Date(), i);
+    const chave = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+    serie.push({ dia: chave, total: contagem.get(chave) || 0 });
+  }
+  return serie;
 }
 
 /* ------------------------------- Render ---------------------------------- */
@@ -613,6 +645,8 @@ function marcarStatus(ok, quandoISO) {
   }
 }
 
+let ultimosGrupos = [];
+
 async function buscarDados() {
   try {
     const resposta = await fetch(APPS_SCRIPT_URL, { cache: 'no-store' });
@@ -620,7 +654,10 @@ async function buscarDados() {
     const corpo = await resposta.json();
     if (!corpo.dados) throw new Error('Resposta sem campo dados');
 
-    const estado = processarDados(corpo.dados);
+    const grupos = agruparPorCaso(corpo.dados);
+    ultimosGrupos = grupos;
+
+    const estado = processarDados(grupos, corpo.dados.length);
     renderTudo(estado);
     marcarStatus(true, corpo.atualizadoEm);
     document.getElementById('carregando').classList.add('escondido');
@@ -635,11 +672,19 @@ async function buscarDados() {
   }
 }
 
+// Reavalia só a tabela de próximos casos (sem novo fetch), pra remover da tela
+// os casos cujo horário de saída já passou, mesmo entre uma atualização de dados e outra.
+function atualizarProximosCasos() {
+  if (!ultimosGrupos.length) return;
+  renderTabela({ tabela: calcularProximosCasos(ultimosGrupos) });
+}
+
 /* -------------------------------- Início ----------------------------------- */
 
 document.addEventListener('DOMContentLoaded', function () {
   buscarDados();
   setInterval(buscarDados, INTERVALO_ATUALIZACAO_MS);
+  setInterval(atualizarProximosCasos, 60000);
 });
 
 </script>
