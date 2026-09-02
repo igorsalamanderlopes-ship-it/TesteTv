@@ -47,7 +47,7 @@
   .topo {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     position: relative;
   }
 
@@ -61,9 +61,8 @@
     font-size: 27px;
     font-weight: 600;
     margin: 0;
-    margin-left: 190px;
     letter-spacing: -0.01em;
-    text-align: left;
+    text-align: center;
     color: var(--azul-marca);
   }
 
@@ -114,14 +113,17 @@
     font-size: 52px;
     font-weight: 600;
     line-height: 1;
+    text-align: center;
+    color: var(--texto-principal);
   }
 
-  .kpi-valor.destaque { color: var(--alerta); }
+  .kpi-valor.destaque { color: var(--texto-principal); }
 
   .kpi-sub {
     color: var(--texto-muted);
     font-size: 15px;
     margin-top: 6px;
+    text-align: center;
   }
 
   .grade-regionais {
@@ -811,7 +813,7 @@ function graficoDonut(refVar, canvasId, itens) {
       maintainAspectRatio: false,
       animation: { duration: 250 },
       plugins: {
-        legend: { display: true, position: 'right', labels: { font: { size: 15, weight: '600' }, color: '#16202B', boxWidth: 12 } }
+        legend: { display: true, position: 'right', labels: { font: { size: 20, weight: '600' }, color: '#16202B', boxWidth: 14 } }
       }
     }
   });
