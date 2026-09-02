@@ -251,7 +251,7 @@
   </div>
 
   <div class="tabela-box">
-    <h2>Casos de hoje</h2>
+    <h2>Casos de hoje e futuros</h2>
     <table>
       <thead>
         <tr>
@@ -403,7 +403,7 @@ function processarDados(dados) {
   const porDia = contarPorDia(grupos);
 
   const tabela = grupos
-    .filter(function (g) { return chaveDia(g.dataViagem) === hoje; })
+    .filter(function (g) { const chave = chaveDia(g.dataViagem); return chave && chave >= hoje; })
     .sort(function (a, b) {
       if (b.qtd !== a.qtd) return b.qtd - a.qtd;
       return new Date(b.dataViagem) - new Date(a.dataViagem);
@@ -430,6 +430,17 @@ function contarPorCampo(grupos, campoNome) {
     contagem.set(chave, (contagem.get(chave) || 0) + 1);
   });
   return Array.from(contagem.entries())
+    .map(function (par) { return { nome: par[0], total: par[1] }; })
+    .sort(function (a, b) { return b.total - a.total; });
+}
+
+function somarPorCampo(grupos, campoNome) {
+  const soma = new Map();
+  grupos.forEach(function (g) {
+    const chave = g[campoNome] || '—';
+    soma.set(chave, (soma.get(chave) || 0) + g.qtd);
+  });
+  return Array.from(soma.entries())
     .map(function (par) { return { nome: par[0], total: par[1] }; })
     .sort(function (a, b) { return b.total - a.total; });
 }
