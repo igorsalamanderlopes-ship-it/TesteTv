@@ -81,7 +81,7 @@
 
   .kpis {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 14px;
   }
 
@@ -157,7 +157,7 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   thead th {
@@ -170,7 +170,7 @@
   }
 
   tbody td {
-    padding: 7px 10px;
+    padding: 5px 10px;
     border-bottom: 1px solid var(--borda);
   }
 
@@ -216,10 +216,6 @@
   </div>
 
   <div class="kpis">
-    <div class="kpi-card">
-      <div class="kpi-label">Casos únicos</div>
-      <div class="kpi-valor num" id="kpiCasos">—</div>
-    </div>
     <div class="kpi-card">
       <div class="kpi-label">Registros duplicados</div>
       <div class="kpi-valor num destaque" id="kpiRegistros">—</div>
@@ -396,9 +392,9 @@ function processarDados(dados) {
   const registrosDuplicados = dados.length;
   const casosHoje = grupos.filter(function (g) { return chaveDia(g.dataViagem) === hoje; }).length;
 
-  const porOrigem = contarPorCampo(grupos, 'origem').slice(0, 8);
-  const porTipo = contarPorCampo(grupos, 'tipoGratuidade').slice(0, 8);
-  const porLinha = contarPorCampo(grupos, 'linha').slice(0, 10);
+  const porOrigem = contarPorCampo(grupos, 'origem').slice(0, 5);
+  const porTipo = contarPorCampo(grupos, 'tipoGratuidade').slice(0, 5);
+  const porLinha = contarPorCampo(grupos, 'linha').slice(0, 5);
   const porDia = contarPorDia(grupos);
 
   const tabela = grupos
@@ -407,7 +403,7 @@ function processarDados(dados) {
       if (b.qtd !== a.qtd) return b.qtd - a.qtd;
       return new Date(b.dataViagem) - new Date(a.dataViagem);
     })
-    .slice(0, 10);
+    .slice(0, 8);
 
   return {
     casosUnicos: casosUnicos,
@@ -448,7 +444,6 @@ function contarPorDia(grupos) {
 /* ------------------------------- Render ---------------------------------- */
 
 function renderKPIs(e) {
-  document.getElementById('kpiCasos').textContent = e.casosUnicos.toLocaleString('pt-BR');
   document.getElementById('kpiRegistros').textContent = e.registrosDuplicados.toLocaleString('pt-BR');
   document.getElementById('kpiHoje').textContent = e.casosHoje.toLocaleString('pt-BR');
 
@@ -473,7 +468,13 @@ function graficoBarraHorizontal(refVar, canvasId, itens, cor) {
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{ data: valores, backgroundColor: cor, borderRadius: 4, barThickness: 18 }]
+      datasets: [{
+        data: valores,
+        backgroundColor: cor,
+        borderRadius: 4,
+        barPercentage: 0.7,
+        categoryPercentage: 0.7
+      }]
     },
     options: {
       indexAxis: 'y',
@@ -488,7 +489,7 @@ function graficoBarraHorizontal(refVar, canvasId, itens, cor) {
         },
         y: {
           grid: { display: false },
-          ticks: { color: '#16202B', font: { size: 12 } }
+          ticks: { color: '#16202B', font: { size: 12 }, autoSkip: false }
         }
       }
     }
