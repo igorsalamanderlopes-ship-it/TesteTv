@@ -500,12 +500,12 @@
       <div class="grafico-canvas-wrap"><canvas id="t2GraficoRegionalTotal"></canvas></div>
     </div>
     <div class="grafico-box">
-      <h2>Ocorrências por mês</h2>
-      <div class="grafico-canvas-wrap"><canvas id="t2GraficoRegionalMes"></canvas></div>
-    </div>
-    <div class="grafico-box">
       <h2>Ocorrência — total acumulado</h2>
       <div class="grafico-canvas-wrap"><canvas id="t2GraficoOcorrenciaTotal"></canvas></div>
+    </div>
+    <div class="grafico-box">
+      <h2>Ocorrências por mês</h2>
+      <div class="grafico-canvas-wrap"><canvas id="t2GraficoRegionalMes"></canvas></div>
     </div>
     <div class="grafico-box">
       <h2>Ocorrência — mês atual</h2>
@@ -543,9 +543,9 @@ const INTERVALO_ATUALIZACAO_MS = 1800000; // 30 minutos, atualização em segund
 
 const CORES = {
   alerta: '#FF3B30',
-  vermelhoEscuro: '#B71C1C',
+  vermelhoEscuro: '#FF3B30',
   vermelhoMedio: '#FF3B30',
-  vermelhoClaro: '#FF6B5D',
+  vermelhoClaro: '#FF3B30',
   textoMuted: '#5B6B7F',
   gradeSutil: '#E1E6EF'
 };
@@ -778,6 +778,41 @@ function renderKPIs(e) {
   document.getElementById('kpiOrigemNome').textContent = topo ? topo.nome : '—';
   document.getElementById('kpiOrigemTotal').textContent = topo ? (topo.total + ' casos') : '';
   document.getElementById('kpiOrigemPeriodo').textContent = e.periodo;
+}
+
+function graficoDonut(refVar, canvasId, itens) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const labels = itens.map(function (i) { return i.nome; });
+  const valores = itens.map(function (i) { return i.total; });
+  const rampaVermelha = ['#7A0C0C', '#B71C1C', '#E53935', '#FF6659', '#FF8A80', '#FFCDD2'];
+
+  if (refVar) {
+    refVar.data.labels = labels;
+    refVar.data.datasets[0].data = valores;
+    refVar.update('none');
+    return refVar;
+  }
+
+  return new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: valores,
+        backgroundColor: rampaVermelha.slice(0, valores.length),
+        borderColor: '#FFFFFF',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 250 },
+      plugins: {
+        legend: { display: true, position: 'right', labels: { font: { size: 12 }, color: '#16202B', boxWidth: 12 } }
+      }
+    }
+  });
 }
 
 function graficoBarraHorizontal(refVar, canvasId, itens, cor) {
@@ -1133,8 +1168,8 @@ function t2RenderGraficoPorMes(e) {
     data: {
       labels: e.mesesLabels,
       datasets: [
-        { label: 'Registros', data: e.porMesRegistros, backgroundColor: '#1B7A3D', corRotulo: '#1B7A3D', borderRadius: 4 },
-        { label: 'Enviados p/ análise', data: e.porMesEnviados, backgroundColor: '#B5D93B', corRotulo: '#7A9414', borderRadius: 4 }
+        { label: 'Registros', data: e.porMesRegistros, backgroundColor: '#1B4F8C', corRotulo: '#16202B', borderRadius: 4 },
+        { label: 'Enviados p/ análise', data: e.porMesEnviados, backgroundColor: '#8FC1F2', corRotulo: '#16202B', borderRadius: 4 }
       ]
     },
     plugins: [plugRotulosBarras],
@@ -1161,9 +1196,9 @@ function t2RenderGraficoPorMes(e) {
 
 function t2RenderTudo(e) {
   t2RenderKPIs(e);
-  t2GraficoRegionalTotal = graficoBarraHorizontal(t2GraficoRegionalTotal, 't2GraficoRegionalTotal', e.regionalTotal, CORES.vermelhoEscuro);
+  t2GraficoRegionalTotal = graficoDonut(t2GraficoRegionalTotal, 't2GraficoRegionalTotal', e.regionalTotal);
+  t2GraficoOcorrenciaTotal = graficoDonut(t2GraficoOcorrenciaTotal, 't2GraficoOcorrenciaTotal', e.ocorrenciaTotal);
   t2RenderGraficoPorMes(e);
-  t2GraficoOcorrenciaTotal = graficoBarraHorizontal(t2GraficoOcorrenciaTotal, 't2GraficoOcorrenciaTotal', e.ocorrenciaTotal, CORES.vermelhoEscuro);
   t2GraficoOcorrenciaMes = graficoBarraHorizontal(t2GraficoOcorrenciaMes, 't2GraficoOcorrenciaMes', e.ocorrenciaMes, CORES.vermelhoMedio);
 }
 
