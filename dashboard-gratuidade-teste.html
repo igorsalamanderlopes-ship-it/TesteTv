@@ -255,16 +255,16 @@
   </div>
 
   <div class="tabela-box">
-    <h2>Casos recentes</h2>
+    <h2>Casos de hoje</h2>
     <table>
       <thead>
         <tr>
           <th>Caso</th>
           <th>Linha</th>
+          <th>Hora</th>
           <th>Origem</th>
           <th>Tipo Gratuidade</th>
           <th>Data</th>
-          <th>Hora</th>
           <th>Qtd</th>
         </tr>
       </thead>
@@ -296,7 +296,7 @@
    Dashboard de Gratuidade Duplicada — página única, tema claro
    ========================================================================== */
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzI4d4g2L4weMGchgxBv4VzCu13BOI0hZnvbVBMG50gJxQ8HnqBMQo7EORLK1gHmWpGQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0s1LQvCEPl92LPwWU4qR6lSbP2du6Rv49iYrtzUCzc9x8WCVM9HhXBp1_pa9Agpr3sg/exec';
 const INTERVALO_ATUALIZACAO_MS = 1800000; // 30 minutos, atualização em segundo plano
 
 const CORES = {
@@ -407,7 +407,7 @@ function processarDados(dados) {
   const porDia = contarPorDia(grupos);
 
   const tabela = grupos
-    .slice()
+    .filter(function (g) { return chaveDia(g.dataViagem) === hoje; })
     .sort(function (a, b) {
       if (b.qtd !== a.qtd) return b.qtd - a.qtd;
       return new Date(b.dataViagem) - new Date(a.dataViagem);
@@ -573,10 +573,10 @@ function renderTabela(e) {
     tr.innerHTML =
       '<td>' + g.caso + '</td>' +
       '<td>' + g.linha + '</td>' +
+      '<td>' + formatarHoraCurta(g.horaViagem) + '</td>' +
       '<td>' + g.origem + '</td>' +
       '<td>' + g.tipoGratuidade + '</td>' +
       '<td>' + formatarDataCurta(g.dataViagem) + '</td>' +
-      '<td>' + formatarHoraCurta(g.horaViagem) + '</td>' +
       '<td class="col-qtd">' + g.qtd + '</td>';
     corpo.appendChild(tr);
   });
