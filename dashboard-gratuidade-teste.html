@@ -12,6 +12,7 @@
     --texto-muted: #5B6B7F;
     --alerta: #E0492E;
     --azul-marca: #518AD7;
+    --azul-claro: #6FA0DE;
     --borda: #E1E6EF;
   }
 
@@ -176,8 +177,8 @@
 
   thead th {
     text-align: left;
-    color: var(--texto-muted);
-    font-weight: 500;
+    color: var(--azul-claro);
+    font-weight: 700;
     font-size: 11px;
     padding: 0 10px 8px 10px;
     border-bottom: 1px solid var(--borda);
@@ -242,6 +243,7 @@
     <div class="kpi-card">
       <div class="kpi-label">Registros duplicados</div>
       <div class="kpi-valor num destaque" id="kpiRegistros">—</div>
+      <div class="kpi-sub" id="kpiRegistrosPeriodo"></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Casos hoje</div>
@@ -251,6 +253,7 @@
       <div class="kpi-label">Origem com mais casos</div>
       <div class="kpi-valor" id="kpiOrigemNome" style="font-size: 20px;">—</div>
       <div class="kpi-sub" id="kpiOrigemTotal"></div>
+      <div class="kpi-sub" id="kpiOrigemPeriodo"></div>
     </div>
   </div>
 
@@ -428,6 +431,7 @@ function processarDados(grupos, totalRegistros) {
   const casosUnicos = grupos.length;
   const registrosDuplicados = totalRegistros;
   const casosHoje = grupos.filter(function (g) { return chaveDia(g.dataViagem) === hoje; }).length;
+  const periodo = calcularPeriodo(grupos);
 
   const porOrigem = contarPorCampo(grupos, 'origem').slice(0, 5);
   const porTipo = contarPorCampo(grupos, 'tipoGratuidade').slice(0, 5);
@@ -440,12 +444,29 @@ function processarDados(grupos, totalRegistros) {
     casosUnicos: casosUnicos,
     registrosDuplicados: registrosDuplicados,
     casosHoje: casosHoje,
+    periodo: periodo,
     porOrigem: porOrigem,
     porTipo: porTipo,
     porLinha: porLinha,
     porDia: porDia,
     tabela: tabela
   };
+}
+
+// Menor e maior data presentes nos dados, formatado como "dd/MM a dd/MM"
+function calcularPeriodo(grupos) {
+  const chaves = grupos
+    .map(function (g) { return chaveDia(g.dataViagem); })
+    .filter(Boolean)
+    .sort();
+
+  if (!chaves.length) return '—';
+
+  const inicio = chaves[0];
+  const fim = chaves[chaves.length - 1];
+  const formatarChave = function (c) { const p = c.split('-'); return p[2] + '/' + p[1]; };
+
+  return inicio === fim ? formatarChave(inicio) : formatarChave(inicio) + ' a ' + formatarChave(fim);
 }
 
 // Casos de hoje em diante (janela de 7 dias), removendo os de hoje cujo
@@ -520,11 +541,13 @@ function gerarSerieSeteDias(grupos) {
 
 function renderKPIs(e) {
   document.getElementById('kpiRegistros').textContent = e.registrosDuplicados.toLocaleString('pt-BR');
+  document.getElementById('kpiRegistrosPeriodo').textContent = e.periodo;
   document.getElementById('kpiHoje').textContent = e.casosHoje.toLocaleString('pt-BR');
 
   const topo = e.porOrigem[0];
   document.getElementById('kpiOrigemNome').textContent = topo ? topo.nome : '—';
   document.getElementById('kpiOrigemTotal').textContent = topo ? (topo.total + ' casos') : '';
+  document.getElementById('kpiOrigemPeriodo').textContent = e.periodo;
 }
 
 function graficoBarraHorizontal(refVar, canvasId, itens, cor) {
