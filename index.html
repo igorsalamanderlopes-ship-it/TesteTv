@@ -58,11 +58,12 @@
   }
 
   .topo h1 {
-    font-size: 27px;
-    font-weight: 600;
+    font-size: 36px;
+    font-weight: 700;
     margin: 0;
     letter-spacing: -0.01em;
     text-align: center;
+    width: 100%;
     color: var(--azul-marca);
   }
 
@@ -146,20 +147,20 @@
   }
 
   .regional-card .regional-nome {
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--azul-marca);
   }
 
   .regional-card .regional-qtd {
-    font-size: 26px;
+    font-size: 32px;
     font-weight: 600;
     color: var(--alerta);
     line-height: 1;
   }
 
   .regional-card .regional-periodo {
-    font-size: 10px;
+    font-size: 13px;
     color: var(--texto-muted);
   }
 
@@ -183,7 +184,7 @@
   }
 
   .grafico-box h2 {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 700;
     margin: -18px -22px 12px -22px;
     padding: 10px 22px;
@@ -784,6 +785,35 @@ function renderKPIs(e) {
   document.getElementById('kpiOrigemPeriodo').textContent = e.periodo;
 }
 
+const plugRotulosDonut = {
+  id: 'rotulosDonut',
+  afterDatasetsDraw: function (chart) {
+    const ctx = chart.ctx;
+    const meta = chart.getDatasetMeta(0);
+    const dataset = chart.data.datasets[0];
+    const total = dataset.data.reduce(function (a, b) { return a + b; }, 0);
+    if (!total) return;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    meta.data.forEach(function (arco, indice) {
+      const valor = dataset.data[indice];
+      if (!valor) return;
+      const percentual = Math.round(valor / total * 100);
+      const angulo = (arco.startAngle + arco.endAngle) / 2;
+      const raio = (arco.innerRadius + arco.outerRadius) / 2;
+      const x = arco.x + Math.cos(angulo) * raio;
+      const y = arco.y + Math.sin(angulo) * raio;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '700 16px -apple-system, sans-serif';
+      ctx.fillText(percentual + '%', x, y - 9);
+      ctx.font = '600 13px -apple-system, sans-serif';
+      ctx.fillText(String(valor), x, y + 10);
+    });
+    ctx.restore();
+  }
+};
+
 function graficoDonut(refVar, canvasId, itens) {
   const ctx = document.getElementById(canvasId).getContext('2d');
   const labels = itens.map(function (i) { return i.nome; });
@@ -808,12 +838,13 @@ function graficoDonut(refVar, canvasId, itens) {
         borderWidth: 2
       }]
     },
+    plugins: [plugRotulosDonut],
     options: {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 250 },
       plugins: {
-        legend: { display: true, position: 'right', labels: { font: { size: 20, weight: '600' }, color: '#16202B', boxWidth: 14 } }
+        legend: { display: true, position: 'right', labels: { font: { size: 28, weight: '600' }, color: '#16202B', boxWidth: 20, padding: 16 } }
       }
     }
   });
@@ -852,11 +883,11 @@ function graficoBarraHorizontal(refVar, canvasId, itens, cor) {
       scales: {
         x: {
           grid: { color: CORES.gradeSutil },
-          ticks: { color: CORES.textoMuted, font: { size: 13 }, precision: 0 }
+          ticks: { color: CORES.textoMuted, font: { size: 15 }, precision: 0 }
         },
         y: {
           grid: { display: false },
-          ticks: { color: '#16202B', font: { size: 13 }, autoSkip: false }
+          ticks: { color: '#16202B', font: { size: 16, weight: '600' }, autoSkip: false }
         }
       }
     }
