@@ -89,25 +89,27 @@
     gap: 14px;
   }
 
+  .kpis-4 { grid-template-columns: repeat(4, 1fr); }
+
   .kpi-card {
     background: var(--bg-painel);
     border: 1px solid var(--borda);
     border-radius: 10px;
-    padding: 16px 20px;
+    padding: 20px 24px;
     overflow: hidden;
   }
 
   .kpi-label {
     color: #FFFFFF;
     font-weight: 700;
-    font-size: 14px;
-    margin: -16px -20px 12px -20px;
-    padding: 9px 20px;
+    font-size: 16px;
+    margin: -20px -24px 16px -24px;
+    padding: 11px 24px;
     background: var(--azul-marca);
   }
 
   .kpi-valor {
-    font-size: 36px;
+    font-size: 52px;
     font-weight: 600;
     line-height: 1;
   }
@@ -116,8 +118,8 @@
 
   .kpi-sub {
     color: var(--texto-muted);
-    font-size: 13px;
-    margin-top: 5px;
+    font-size: 15px;
+    margin-top: 6px;
   }
 
   .grade-regionais {
@@ -130,30 +132,30 @@
     background: var(--bg-painel);
     border: 1px solid var(--borda);
     border-radius: 10px;
-    padding: 14px 16px;
-    aspect-ratio: 1 / 1;
+    padding: 10px 12px;
+    height: 90px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     text-align: center;
-    gap: 4px;
+    gap: 2px;
   }
 
   .regional-card .regional-nome {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--azul-marca);
   }
 
   .regional-card .regional-qtd {
-    font-size: 34px;
+    font-size: 26px;
     font-weight: 600;
     color: var(--alerta);
     line-height: 1;
   }
 
   .regional-card .regional-periodo {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--texto-muted);
   }
 
@@ -209,20 +211,20 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 18px;
   }
 
   thead th {
     text-align: left;
     color: var(--azul-claro);
     font-weight: 700;
-    font-size: 13px;
-    padding: 0 10px 8px 10px;
+    font-size: 16px;
+    padding: 0 12px 12px 12px;
     border-bottom: 1px solid var(--borda);
   }
 
   tbody td {
-    padding: 6px 10px;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--borda);
   }
 
@@ -387,7 +389,7 @@
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Origem com mais casos</div>
-      <div class="kpi-valor" id="kpiOrigemNome" style="font-size: 18px;">—</div>
+      <div class="kpi-valor" id="kpiOrigemNome" style="font-size: 26px;">—</div>
       <div class="kpi-sub" id="kpiOrigemTotal"></div>
       <div class="kpi-sub" id="kpiOrigemPeriodo"></div>
     </div>
@@ -473,7 +475,7 @@
     </div>
   </div>
 
-  <div class="kpis">
+  <div class="kpis kpis-4">
     <div class="kpi-card">
       <div class="kpi-label">Total de acompanhamentos</div>
       <div class="kpi-valor num destaque" id="t2KpiTotal">—</div>
@@ -486,6 +488,10 @@
       <div class="kpi-label">Enviados para análise</div>
       <div class="kpi-valor num" id="t2KpiEnviados">—</div>
     </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Não enviados para análise</div>
+      <div class="kpi-valor num" id="t2KpiNaoEnviados">—</div>
+    </div>
   </div>
 
   <div class="grade-graficos">
@@ -494,7 +500,7 @@
       <div class="grafico-canvas-wrap"><canvas id="t2GraficoRegionalTotal"></canvas></div>
     </div>
     <div class="grafico-box">
-      <h2>Regional — mês atual</h2>
+      <h2>Ocorrências por mês</h2>
       <div class="grafico-canvas-wrap"><canvas id="t2GraficoRegionalMes"></canvas></div>
     </div>
     <div class="grafico-box">
@@ -720,7 +726,7 @@ function calcularProximosCasos(grupos) {
       const minutosB = minutosDaHora(b.horaViagem) || 0;
       return minutosA - minutosB;
     })
-    .slice(0, 8);
+    .slice(0, 15);
 }
 
 function contarPorCampo(grupos, campoNome) {
@@ -1027,21 +1033,39 @@ function t2ContarPorCampo(linhas, nomesCampo) {
     .sort(function (a, b) { return b.total - a.total; });
 }
 
+function t2UltimosMeses(qtd) {
+  const meses = [];
+  const agora = new Date();
+  for (let i = qtd - 1; i >= 0; i--) {
+    const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+    meses.push(d.getFullYear() + '-' + pad2(d.getMonth() + 1));
+  }
+  return meses;
+}
+
+function t2FormatarMesLabel(chave) {
+  const partes = chave.split('-');
+  const nomes = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  return nomes[parseInt(partes[1], 10) - 1] + '/' + partes[0].slice(2);
+}
+
 function t2Processar(dados) {
   const agora = new Date();
   const mesAtual = agora.getFullYear() + '-' + pad2(agora.getMonth() + 1);
 
   const doMes = dados.filter(function (l) { return t2ChaveMes(campo(l, 'Data Serviço')) === mesAtual; });
 
-  const total = dados.length;
-  const totalMes = doMes.length;
-  const enviados = dados.filter(function (l) {
+  const ehEnviado = function (l) {
     const v = campo(l, 'Receber e-mail');
     return v && String(v).trim().toLowerCase() === 'sim';
-  }).length;
+  };
+
+  const total = dados.length;
+  const totalMes = doMes.length;
+  const enviados = dados.filter(ehEnviado).length;
+  const naoEnviados = total - enviados;
 
   const regionalTotal = t2ContarPorCampo(dados, 'Regional').slice(0, 6);
-  const regionalMes = t2ContarPorCampo(doMes, 'Regional').slice(0, 6);
 
   const filtrarSemOcorrencia = function (l) {
     const v = campo(l, 'Ocorrência');
@@ -1050,19 +1074,95 @@ function t2Processar(dados) {
   const ocorrenciaTotal = t2ContarPorCampo(dados.filter(filtrarSemOcorrencia), 'Ocorrência').slice(0, 6);
   const ocorrenciaMes = t2ContarPorCampo(doMes.filter(filtrarSemOcorrencia), 'Ocorrência').slice(0, 6);
 
-  return { total: total, totalMes: totalMes, enviados: enviados, regionalTotal: regionalTotal, regionalMes: regionalMes, ocorrenciaTotal: ocorrenciaTotal, ocorrenciaMes: ocorrenciaMes };
+  const chavesMeses = t2UltimosMeses(6);
+  const mesesLabels = chavesMeses.map(t2FormatarMesLabel);
+  const porMesRegistros = chavesMeses.map(function (m) {
+    return dados.filter(function (l) { return t2ChaveMes(campo(l, 'Data Serviço')) === m; }).length;
+  });
+  const porMesEnviados = chavesMeses.map(function (m) {
+    return dados.filter(function (l) { return t2ChaveMes(campo(l, 'Data Serviço')) === m && ehEnviado(l); }).length;
+  });
+
+  return {
+    total: total, totalMes: totalMes, enviados: enviados, naoEnviados: naoEnviados,
+    regionalTotal: regionalTotal, ocorrenciaTotal: ocorrenciaTotal, ocorrenciaMes: ocorrenciaMes,
+    mesesLabels: mesesLabels, porMesRegistros: porMesRegistros, porMesEnviados: porMesEnviados
+  };
 }
 
 function t2RenderKPIs(e) {
   document.getElementById('t2KpiTotal').textContent = e.total.toLocaleString('pt-BR');
   document.getElementById('t2KpiMes').textContent = e.totalMes.toLocaleString('pt-BR');
   document.getElementById('t2KpiEnviados').textContent = e.enviados.toLocaleString('pt-BR');
+  document.getElementById('t2KpiNaoEnviados').textContent = e.naoEnviados.toLocaleString('pt-BR');
+}
+
+const plugRotulosBarras = {
+  id: 'rotulosBarras',
+  afterDatasetsDraw: function (chart) {
+    const ctx = chart.ctx;
+    chart.data.datasets.forEach(function (dataset, dsIndex) {
+      const meta = chart.getDatasetMeta(dsIndex);
+      ctx.save();
+      ctx.fillStyle = dataset.corRotulo || '#16202B';
+      ctx.font = '700 13px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      meta.data.forEach(function (barra, indice) {
+        const valor = dataset.data[indice];
+        ctx.fillText(String(valor), barra.x, barra.y - 6);
+      });
+      ctx.restore();
+    });
+  }
+};
+
+function t2RenderGraficoPorMes(e) {
+  const ctx = document.getElementById('t2GraficoRegionalMes').getContext('2d');
+
+  if (t2GraficoRegionalMes) {
+    t2GraficoRegionalMes.data.labels = e.mesesLabels;
+    t2GraficoRegionalMes.data.datasets[0].data = e.porMesRegistros;
+    t2GraficoRegionalMes.data.datasets[1].data = e.porMesEnviados;
+    t2GraficoRegionalMes.update('none');
+    return;
+  }
+
+  t2GraficoRegionalMes = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: e.mesesLabels,
+      datasets: [
+        { label: 'Registros', data: e.porMesRegistros, backgroundColor: '#1B7A3D', corRotulo: '#1B7A3D', borderRadius: 4 },
+        { label: 'Enviados p/ análise', data: e.porMesEnviados, backgroundColor: '#B5D93B', corRotulo: '#7A9414', borderRadius: 4 }
+      ]
+    },
+    plugins: [plugRotulosBarras],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 20 } },
+      animation: { duration: 250 },
+      plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 12 } } } },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#E07A1A', font: { size: 13, weight: '700' } }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: CORES.gradeSutil },
+          ticks: { color: CORES.textoMuted, font: { size: 12 }, precision: 0 }
+        }
+      }
+    }
+  });
 }
 
 function t2RenderTudo(e) {
   t2RenderKPIs(e);
   t2GraficoRegionalTotal = graficoBarraHorizontal(t2GraficoRegionalTotal, 't2GraficoRegionalTotal', e.regionalTotal, CORES.vermelhoEscuro);
-  t2GraficoRegionalMes = graficoBarraHorizontal(t2GraficoRegionalMes, 't2GraficoRegionalMes', e.regionalMes, CORES.vermelhoMedio);
+  t2RenderGraficoPorMes(e);
   t2GraficoOcorrenciaTotal = graficoBarraHorizontal(t2GraficoOcorrenciaTotal, 't2GraficoOcorrenciaTotal', e.ocorrenciaTotal, CORES.vermelhoEscuro);
   t2GraficoOcorrenciaMes = graficoBarraHorizontal(t2GraficoOcorrenciaMes, 't2GraficoOcorrenciaMes', e.ocorrenciaMes, CORES.vermelhoMedio);
 }
