@@ -622,6 +622,10 @@ async function buscarDados() {
   } catch (erro) {
     console.warn('Falha ao atualizar dados, mantendo tela atual:', erro);
     marcarStatus(false, null);
+    const carregando = document.getElementById('carregando');
+    if (!carregando.classList.contains('escondido')) {
+      carregando.textContent = 'Não foi possível carregar os dados. Verifique a conexão com o Apps Script.';
+    }
   }
 }
 
