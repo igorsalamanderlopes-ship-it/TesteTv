@@ -49,6 +49,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    padding: 22px 0 26px 0;
   }
 
   .logo {
@@ -167,10 +168,14 @@
   .grade-graficos {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: repeat(2, 1fr);
     gap: 14px;
     flex: 1;
     min-height: 0;
+  }
+
+  .grade-graficos-3 {
+    grid-template-rows: repeat(3, 1fr);
   }
 
   .grafico-box {
@@ -201,6 +206,7 @@
     border-radius: 10px;
     padding: 18px 22px;
     flex-shrink: 0;
+    min-height: 0;
   }
 
   .tabela-box h2 {
@@ -219,18 +225,22 @@
     font-size: 18px;
   }
 
+  thead tr { background: #2E5A8F; }
+
   thead th {
     text-align: left;
-    color: var(--azul-claro);
+    color: #FFFFFF;
     font-weight: 700;
     font-size: 16px;
-    padding: 0 12px 12px 12px;
-    border-bottom: 1px solid var(--borda);
+    padding: 10px 12px;
+    border-bottom: none;
   }
 
   tbody td {
     padding: 10px 12px;
     border-bottom: 1px solid var(--borda);
+    color: #0D141C;
+    font-weight: 500;
   }
 
   .col-apertada-direita { padding-right: 2px; }
@@ -394,30 +404,36 @@
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Origem com mais casos</div>
-      <div class="kpi-valor" id="kpiOrigemNome" style="font-size: 26px;">—</div>
+      <div class="kpi-valor" id="kpiOrigemNome">—</div>
       <div class="kpi-sub" id="kpiOrigemTotal"></div>
       <div class="kpi-sub" id="kpiOrigemPeriodo"></div>
     </div>
   </div>
 
-  <div class="grade-regionais" id="gradeRegionais"></div>
-
-  <div class="grade-graficos">
+  <div class="grade-graficos grade-graficos-3">
     <div class="grafico-box">
       <h2>Casos por origem</h2>
       <div class="grafico-canvas-wrap"><canvas id="graficoOrigem"></canvas></div>
-    </div>
-    <div class="grafico-box">
-      <h2>Casos por tipo de gratuidade</h2>
-      <div class="grafico-canvas-wrap"><canvas id="graficoTipo"></canvas></div>
     </div>
     <div class="grafico-box">
       <h2>Casos por dia</h2>
       <div class="grafico-canvas-wrap"><canvas id="graficoTendencia"></canvas></div>
     </div>
     <div class="grafico-box">
+      <h2>Casos por tipo de gratuidade</h2>
+      <div class="grafico-canvas-wrap"><canvas id="graficoTipo"></canvas></div>
+    </div>
+    <div class="grafico-box">
       <h2>Linhas com mais casos</h2>
       <div class="grafico-canvas-wrap"><canvas id="graficoLinhas"></canvas></div>
+    </div>
+    <div class="grafico-box">
+      <h2>Regionais</h2>
+      <div class="grafico-canvas-wrap"><canvas id="graficoRegional"></canvas></div>
+    </div>
+    <div class="grafico-box">
+      <h2>Agência com mais casos</h2>
+      <div class="grafico-canvas-wrap"><canvas id="graficoAgencia"></canvas></div>
     </div>
   </div>
 
@@ -441,7 +457,7 @@
 
   <div class="tabela-box" style="flex: 1; display: flex; flex-direction: column;">
     <h2>Próximos Casos</h2>
-    <div style="flex: 1; overflow: auto;">
+    <div id="scrollProximosCasos" style="flex: 1; overflow: auto;">
     <table>
       <thead>
         <tr>
@@ -486,16 +502,16 @@
       <div class="kpi-valor num destaque" id="t2KpiTotal">—</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Acompanhamentos no mês</div>
-      <div class="kpi-valor num" id="t2KpiMes">—</div>
+      <div class="kpi-label">Não enviados para análise</div>
+      <div class="kpi-valor num" id="t2KpiNaoEnviados">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Sem ocorrência</div>
+      <div class="kpi-valor num" id="t2KpiSemOcorrencia">—</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Enviados para análise</div>
       <div class="kpi-valor num" id="t2KpiEnviados">—</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Não enviados para análise</div>
-      <div class="kpi-valor num" id="t2KpiNaoEnviados">—</div>
     </div>
   </div>
 
@@ -559,6 +575,8 @@ let graficoOrigem = null;
 let graficoTipo = null;
 let graficoTendencia = null;
 let graficoLinhas = null;
+let graficoRegional = null;
+let graficoAgencia = null;
 
 /* ---------------------------- Utilitários ------------------------------- */
 
@@ -638,6 +656,7 @@ function agruparPorCaso(dados) {
     const caso = campo(linha, 'Caso');
     if (caso === undefined) return;
     const chave = String(caso);
+    const agencia = campo(linha, 'Agência', 'Agencia') || '—';
 
     if (!grupos.has(chave)) {
       grupos.set(chave, {
@@ -649,13 +668,30 @@ function agruparPorCaso(dados) {
         tipoGratuidade: campo(linha, 'Tipo Gratuidade') || '—',
         dataViagem: campo(linha, 'Data Viagem'),
         horaViagem: campo(linha, 'Hora Viagem'),
-        qtd: 0
+        qtd: 0,
+        agencias: new Set()
       });
     }
-    grupos.get(chave).qtd += 1;
+    const grupo = grupos.get(chave);
+    grupo.qtd += 1;
+    grupo.agencias.add(agencia);
   });
 
   return Array.from(grupos.values());
+}
+
+// Só conta o caso para uma agência quando TODAS as linhas do caso foram emitidas pela mesma agência
+function contarAgenciaUnica(grupos) {
+  const contagem = new Map();
+  grupos.forEach(function (g) {
+    if (g.agencias && g.agencias.size === 1) {
+      const nomeAgencia = Array.from(g.agencias)[0];
+      contagem.set(nomeAgencia, (contagem.get(nomeAgencia) || 0) + 1);
+    }
+  });
+  return Array.from(contagem.entries())
+    .map(function (par) { return { nome: par[0], total: par[1] }; })
+    .sort(function (a, b) { return b.total - a.total; });
 }
 
 function processarDados(grupos, totalRegistros) {
@@ -670,6 +706,7 @@ function processarDados(grupos, totalRegistros) {
   const porTipo = contarPorCampo(grupos, 'tipoGratuidade').slice(0, 5);
   const porLinha = contarPorCampo(grupos, 'linha').slice(0, 5);
   const porRegional = contarPorCampo(grupos, 'regional').slice(0, 5);
+  const porAgencia = contarAgenciaUnica(grupos).slice(0, 5);
   const porDia = gerarSerieSeteDias(grupos);
 
   const tabela = calcularProximosCasos(grupos);
@@ -683,6 +720,7 @@ function processarDados(grupos, totalRegistros) {
     porTipo: porTipo,
     porLinha: porLinha,
     porRegional: porRegional,
+    porAgencia: porAgencia,
     porDia: porDia,
     tabela: tabela
   };
@@ -730,8 +768,7 @@ function calcularProximosCasos(grupos) {
       const minutosA = minutosDaHora(a.horaViagem) || 0;
       const minutosB = minutosDaHora(b.horaViagem) || 0;
       return minutosA - minutosB;
-    })
-    .slice(0, 30);
+    });
 }
 
 function contarPorCampo(grupos, campoNome) {
@@ -818,7 +855,7 @@ function graficoDonut(refVar, canvasId, itens) {
   const ctx = document.getElementById(canvasId).getContext('2d');
   const labels = itens.map(function (i) { return i.nome; });
   const valores = itens.map(function (i) { return i.total; });
-  const paletaVariada = ['#3B82F6', '#F59E0B', '#10B981', '#8B5CF6', '#EC4899', '#14B8A6'];
+  const paletaVariada = ['#3B82F6', '#F59E0B', '#10B981', '#8B5CF6', '#EC4899', '#64748B'];
 
   if (refVar) {
     refVar.data.labels = labels;
@@ -844,7 +881,7 @@ function graficoDonut(refVar, canvasId, itens) {
       maintainAspectRatio: false,
       animation: { duration: 250 },
       plugins: {
-        legend: { display: true, position: 'right', labels: { font: { size: 28, weight: '600' }, color: '#16202B', boxWidth: 20, padding: 16 } }
+        legend: { display: true, position: 'right', align: 'center', labels: { font: { size: 15, weight: '600' }, color: '#16202B', boxWidth: 14, padding: 8 } }
       }
     }
   });
@@ -925,6 +962,14 @@ function renderGraficoTipo(e) {
 
 function renderGraficoLinhas(e) {
   graficoLinhas = graficoBarraHorizontal(graficoLinhas, 'graficoLinhas', e.porLinha, CORES.vermelhoClaro);
+}
+
+function renderGraficoRegional(e) {
+  graficoRegional = graficoBarraHorizontal(graficoRegional, 'graficoRegional', e.porRegional, CORES.alerta);
+}
+
+function renderGraficoAgencia(e) {
+  graficoAgencia = graficoBarraHorizontal(graficoAgencia, 'graficoAgencia', e.porAgencia, CORES.alerta);
 }
 
 const plugRotulosPonto = {
@@ -1012,27 +1057,14 @@ function renderTabela(e) {
   });
 }
 
-function renderRegionais(e) {
-  const container = document.getElementById('gradeRegionais');
-  container.innerHTML = '';
-  e.porRegional.forEach(function (r) {
-    const div = document.createElement('div');
-    div.className = 'regional-card';
-    div.innerHTML =
-      '<div class="regional-nome">' + r.nome + '</div>' +
-      '<div class="regional-qtd num">' + r.total.toLocaleString('pt-BR') + '</div>' +
-      '<div class="regional-periodo">' + e.periodo + '</div>';
-    container.appendChild(div);
-  });
-}
-
 function renderTudo(e) {
   renderKPIs(e);
-  renderRegionais(e);
   renderGraficoOrigem(e);
   renderGraficoTipo(e);
   renderGraficoLinhas(e);
   renderGraficoTendencia(e);
+  renderGraficoRegional(e);
+  renderGraficoAgencia(e);
   renderTabela(e);
 }
 
@@ -1162,8 +1194,9 @@ function t2Processar(dados) {
     const v = campo(l, 'Ocorrência');
     return v && normalizarChaveTexto(v).indexOf('sem ocorr') === -1;
   };
-  const ocorrenciaTotal = t2ContarPorCampo(dados.filter(filtrarSemOcorrencia), 'Ocorrência').slice(0, 6);
-  const ocorrenciaMes = t2ContarPorCampo(doMes.filter(filtrarSemOcorrencia), 'Ocorrência').slice(0, 6);
+  const semOcorrencia = dados.filter(function (l) { return !filtrarSemOcorrencia(l); }).length;
+  const ocorrenciaTotal = t2ContarPorCampo(dados, 'Ocorrência').slice(0, 6);
+  const ocorrenciaMes = t2ContarPorCampo(doMes, 'Ocorrência').slice(0, 6);
 
   const chavesMeses = t2UltimosMeses(6);
   const mesesLabels = chavesMeses.map(t2FormatarMesLabel);
@@ -1175,7 +1208,7 @@ function t2Processar(dados) {
   });
 
   return {
-    total: total, totalMes: totalMes, enviados: enviados, naoEnviados: naoEnviados,
+    total: total, totalMes: totalMes, enviados: enviados, naoEnviados: naoEnviados, semOcorrencia: semOcorrencia,
     regionalTotal: regionalTotal, ocorrenciaTotal: ocorrenciaTotal, ocorrenciaMes: ocorrenciaMes,
     mesesLabels: mesesLabels, porMesRegistros: porMesRegistros, porMesEnviados: porMesEnviados
   };
@@ -1183,9 +1216,9 @@ function t2Processar(dados) {
 
 function t2RenderKPIs(e) {
   document.getElementById('t2KpiTotal').textContent = e.total.toLocaleString('pt-BR');
-  document.getElementById('t2KpiMes').textContent = e.totalMes.toLocaleString('pt-BR');
   document.getElementById('t2KpiEnviados').textContent = e.enviados.toLocaleString('pt-BR');
   document.getElementById('t2KpiNaoEnviados').textContent = e.naoEnviados.toLocaleString('pt-BR');
+  document.getElementById('t2KpiSemOcorrencia').textContent = e.semOcorrencia.toLocaleString('pt-BR');
 }
 
 const plugRotulosBarras = {
@@ -1234,7 +1267,7 @@ function t2RenderGraficoPorMes(e) {
       maintainAspectRatio: false,
       layout: { padding: { top: 20 } },
       animation: { duration: 250 },
-      plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 12 } } } },
+      plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 20, font: { size: 28, weight: '600' }, padding: 16 } } },
       scales: {
         x: {
           grid: { display: false },
@@ -1303,6 +1336,39 @@ function irPara(idTela) {
   document.getElementById(idTela).classList.add('ativa');
   const indice = ORDEM_TELAS.indexOf(idTela);
   if (indice !== -1) indiceTelaAtual = indice;
+  if (idTela === 'tela2') {
+    iniciarRolagemProximosCasos();
+  } else {
+    pararRolagemProximosCasos();
+  }
+}
+
+let rolagemProximosCasosTimer = null;
+
+function pararRolagemProximosCasos() {
+  if (rolagemProximosCasosTimer) {
+    clearInterval(rolagemProximosCasosTimer);
+    rolagemProximosCasosTimer = null;
+  }
+}
+
+// Rola a lista de "Próximos Casos" de cima para baixo ao longo do tempo em que a tela fica ativa
+function iniciarRolagemProximosCasos() {
+  pararRolagemProximosCasos();
+  const container = document.getElementById('scrollProximosCasos');
+  if (!container) return;
+  container.scrollTop = 0;
+  const duracaoMs = Math.max(1000, INTERVALO_TROCA_TELA_MS - 2000);
+  const passoMs = 50;
+  const totalPassos = Math.max(1, Math.floor(duracaoMs / passoMs));
+  let passoAtual = 0;
+  rolagemProximosCasosTimer = setInterval(function () {
+    passoAtual++;
+    const alvo = container.scrollHeight - container.clientHeight;
+    if (alvo <= 0) { pararRolagemProximosCasos(); return; }
+    container.scrollTop = alvo * (passoAtual / totalPassos);
+    if (passoAtual >= totalPassos) pararRolagemProximosCasos();
+  }, passoMs);
 }
 
 function alternarTelas() {
