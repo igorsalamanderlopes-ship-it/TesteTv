@@ -10,7 +10,7 @@
     --bg-painel: #FFFFFF;
     --texto-principal: #16202B;
     --texto-muted: #5B6B7F;
-    --alerta: #E0492E;
+    --alerta: #FF3B30;
     --azul-marca: #518AD7;
     --azul-claro: #6FA0DE;
     --borda: #E1E6EF;
@@ -37,10 +37,10 @@
   #app, #app2 {
     width: 100vw;
     height: 100vh;
-    padding: 22px 32px;
+    padding: 26px 36px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
     position: relative;
   }
 
@@ -58,7 +58,7 @@
   }
 
   .topo h1 {
-    font-size: 22px;
+    font-size: 27px;
     font-weight: 600;
     margin: 0;
     letter-spacing: -0.01em;
@@ -70,7 +70,7 @@
     align-items: center;
     gap: 8px;
     color: var(--texto-muted);
-    font-size: 13px;
+    font-size: 15px;
     position: absolute;
     right: 0;
   }
@@ -93,21 +93,21 @@
     background: var(--bg-painel);
     border: 1px solid var(--borda);
     border-radius: 10px;
-    padding: 14px 18px;
+    padding: 20px 24px;
     overflow: hidden;
   }
 
   .kpi-label {
     color: #FFFFFF;
     font-weight: 700;
-    font-size: 12px;
-    margin: -14px -18px 10px -18px;
-    padding: 8px 18px;
+    font-size: 15px;
+    margin: -20px -24px 14px -24px;
+    padding: 10px 24px;
     background: var(--azul-marca);
   }
 
   .kpi-valor {
-    font-size: 30px;
+    font-size: 46px;
     font-weight: 600;
     line-height: 1;
   }
@@ -116,8 +116,8 @@
 
   .kpi-sub {
     color: var(--texto-muted);
-    font-size: 12px;
-    margin-top: 4px;
+    font-size: 15px;
+    margin-top: 6px;
   }
 
   .grade-graficos {
@@ -133,17 +133,17 @@
     background: var(--bg-painel);
     border: 1px solid var(--borda);
     border-radius: 10px;
-    padding: 14px 18px;
+    padding: 18px 22px;
     min-height: 0;
     display: flex;
     flex-direction: column;
   }
 
   .grafico-box h2 {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 700;
-    margin: -14px -18px 10px -18px;
-    padding: 8px 18px;
+    margin: -18px -22px 12px -22px;
+    padding: 10px 22px;
     background: var(--azul-marca);
     color: #FFFFFF;
     border-radius: 9px 9px 0 0;
@@ -155,15 +155,15 @@
     background: var(--bg-painel);
     border: 1px solid var(--borda);
     border-radius: 10px;
-    padding: 14px 18px;
+    padding: 18px 22px;
     flex-shrink: 0;
   }
 
   .tabela-box h2 {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 700;
-    margin: -14px -18px 10px -18px;
-    padding: 8px 18px;
+    margin: -18px -22px 12px -22px;
+    padding: 10px 22px;
     background: var(--azul-marca);
     color: #FFFFFF;
     border-radius: 9px 9px 0 0;
@@ -172,20 +172,20 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: 14px;
   }
 
   thead th {
     text-align: left;
     color: var(--azul-claro);
     font-weight: 700;
-    font-size: 11px;
+    font-size: 13px;
     padding: 0 10px 8px 10px;
     border-bottom: 1px solid var(--borda);
   }
 
   tbody td {
-    padding: 5px 10px;
+    padding: 6px 10px;
     border-bottom: 1px solid var(--borda);
   }
 
@@ -402,7 +402,7 @@
   <div class="topo">
     <img class="logo" src="data:image/png;base64,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" alt="Logo Guanabara">
     <div>
-      <h1>Acompanhamento Comercial</h1>
+      <h1>Tela 2 - Acompanhamento de Ocorrências</h1>
     </div>
     <div class="status">
       <span id="t2StatusBolinha" class="bolinha"></span>
@@ -444,21 +444,6 @@
     </div>
   </div>
 
-  <div class="tabela-box">
-    <h2>Últimos enviados</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Regional</th>
-          <th>Nome e Matrícula</th>
-          <th>Ocorrência</th>
-          <th>Data/Hora do envio</th>
-        </tr>
-      </thead>
-      <tbody id="t2CorpoTabela"></tbody>
-    </table>
-  </div>
-
 </div>
 </div>
 
@@ -488,10 +473,10 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0s1LQvCEPl92L
 const INTERVALO_ATUALIZACAO_MS = 1800000; // 30 minutos, atualização em segundo plano
 
 const CORES = {
-  alerta: '#E0492E',
-  vermelhoEscuro: '#8C2F1B',
-  vermelhoMedio: '#E0492E',
-  vermelhoClaro: '#F2795E',
+  alerta: '#FF3B30',
+  vermelhoEscuro: '#B71C1C',
+  vermelhoMedio: '#FF3B30',
+  vermelhoClaro: '#FF6B5D',
   textoMuted: '#5B6B7F',
   gradeSutil: '#E1E6EF'
 };
@@ -503,6 +488,10 @@ let graficoLinhas = null;
 
 /* ---------------------------- Utilitários ------------------------------- */
 
+function normalizarChaveTexto(texto) {
+  return String(texto).replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
 function campo(linha, ...nomes) {
   for (const nome of nomes) {
     if (linha[nome] !== undefined && linha[nome] !== '') return linha[nome];
@@ -510,6 +499,11 @@ function campo(linha, ...nomes) {
   const chaves = Object.keys(linha);
   for (const nome of nomes) {
     const achado = chaves.find(function (k) { return k.toLowerCase() === nome.toLowerCase(); });
+    if (achado && linha[achado] !== '') return linha[achado];
+  }
+  // Fallback final: ignora espaços extras, quebras de linha e espaço não separável (nbsp)
+  for (const nome of nomes) {
+    const achado = chaves.find(function (k) { return normalizarChaveTexto(k) === normalizarChaveTexto(nome); });
     if (achado && linha[achado] !== '') return linha[achado];
   }
   return undefined;
@@ -748,11 +742,11 @@ function graficoBarraHorizontal(refVar, canvasId, itens, cor) {
       scales: {
         x: {
           grid: { color: CORES.gradeSutil },
-          ticks: { color: CORES.textoMuted, font: { size: 12 }, precision: 0 }
+          ticks: { color: CORES.textoMuted, font: { size: 13 }, precision: 0 }
         },
         y: {
           grid: { display: false },
-          ticks: { color: '#16202B', font: { size: 12 }, autoSkip: false }
+          ticks: { color: '#16202B', font: { size: 13 }, autoSkip: false }
         }
       }
     }
@@ -809,7 +803,7 @@ function renderGraficoTendencia(e) {
       datasets: [{
         data: valores,
         borderColor: CORES.alerta,
-        backgroundColor: 'rgba(224,73,46,0.10)',
+        backgroundColor: 'rgba(255,59,48,0.10)',
         fill: true,
         tension: 0.3,
         pointRadius: 3,
@@ -826,12 +820,12 @@ function renderGraficoTendencia(e) {
       scales: {
         x: {
           grid: { display: false },
-          ticks: { color: CORES.textoMuted, font: { size: 12 } }
+          ticks: { color: CORES.textoMuted, font: { size: 13 } }
         },
         y: {
           beginAtZero: true,
           grid: { color: CORES.gradeSutil },
-          ticks: { color: CORES.textoMuted, font: { size: 12 }, precision: 0 }
+          ticks: { color: CORES.textoMuted, font: { size: 13 }, precision: 0 }
         }
       }
     }
@@ -970,18 +964,15 @@ function t2Processar(dados) {
 
   const regionalTotal = t2ContarPorCampo(dados, 'Selecione sua Regional').slice(0, 6);
   const regionalMes = t2ContarPorCampo(doMes, 'Selecione sua Regional').slice(0, 6);
-  const ocorrenciaTotal = t2ContarPorCampo(dados, 'Ocorrência').slice(0, 6);
-  const ocorrenciaMes = t2ContarPorCampo(doMes, 'Ocorrência').slice(0, 6);
 
-  const ultimos = dados.slice()
-    .sort(function (a, b) {
-      const da = t2ParseDataHora(campo(a, 'Completion time', 'Start time'));
-      const db = t2ParseDataHora(campo(b, 'Completion time', 'Start time'));
-      return (db || 0) - (da || 0);
-    })
-    .slice(0, 8);
+  const filtrarSemOcorrencia = function (l) {
+    const v = campo(l, 'Ocorrência');
+    return v && normalizarChaveTexto(v).indexOf('sem ocorr') === -1;
+  };
+  const ocorrenciaTotal = t2ContarPorCampo(dados.filter(filtrarSemOcorrencia), 'Ocorrência').slice(0, 6);
+  const ocorrenciaMes = t2ContarPorCampo(doMes.filter(filtrarSemOcorrencia), 'Ocorrência').slice(0, 6);
 
-  return { total: total, totalMes: totalMes, enviados: enviados, regionalTotal: regionalTotal, regionalMes: regionalMes, ocorrenciaTotal: ocorrenciaTotal, ocorrenciaMes: ocorrenciaMes, ultimos: ultimos };
+  return { total: total, totalMes: totalMes, enviados: enviados, regionalTotal: regionalTotal, regionalMes: regionalMes, ocorrenciaTotal: ocorrenciaTotal, ocorrenciaMes: ocorrenciaMes };
 }
 
 function t2RenderKPIs(e) {
@@ -990,27 +981,12 @@ function t2RenderKPIs(e) {
   document.getElementById('t2KpiEnviados').textContent = e.enviados.toLocaleString('pt-BR');
 }
 
-function t2RenderTabela(e) {
-  const corpo = document.getElementById('t2CorpoTabela');
-  corpo.innerHTML = '';
-  e.ultimos.forEach(function (l) {
-    const tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td>' + (campo(l, 'Selecione sua Regional') || '—') + '</td>' +
-      '<td>' + (campo(l, 'Nome e Matrícula') || '—') + '</td>' +
-      '<td>' + (campo(l, 'Ocorrência') || '—') + '</td>' +
-      '<td>' + t2FormatarDataHora(campo(l, 'Completion time', 'Start time')) + '</td>';
-    corpo.appendChild(tr);
-  });
-}
-
 function t2RenderTudo(e) {
   t2RenderKPIs(e);
   t2GraficoRegionalTotal = graficoBarraHorizontal(t2GraficoRegionalTotal, 't2GraficoRegionalTotal', e.regionalTotal, CORES.vermelhoEscuro);
   t2GraficoRegionalMes = graficoBarraHorizontal(t2GraficoRegionalMes, 't2GraficoRegionalMes', e.regionalMes, CORES.vermelhoMedio);
   t2GraficoOcorrenciaTotal = graficoBarraHorizontal(t2GraficoOcorrenciaTotal, 't2GraficoOcorrenciaTotal', e.ocorrenciaTotal, CORES.vermelhoEscuro);
   t2GraficoOcorrenciaMes = graficoBarraHorizontal(t2GraficoOcorrenciaMes, 't2GraficoOcorrenciaMes', e.ocorrenciaMes, CORES.vermelhoMedio);
-  t2RenderTabela(e);
 }
 
 function t2MarcarStatus(ok, quandoISO) {
@@ -1050,7 +1026,7 @@ async function t2BuscarDados() {
 
 let telaAtual = 'tela1';
 let intervaloPlay = null;
-const INTERVALO_TROCA_TELA_MS = 15000;
+const INTERVALO_TROCA_TELA_MS = 30000;
 
 function irPara(idTela) {
   document.querySelectorAll('.tela').forEach(function (t) { t.classList.remove('ativa'); });
