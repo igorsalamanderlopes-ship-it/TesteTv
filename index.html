@@ -850,6 +850,25 @@ function graficoDonut(refVar, canvasId, itens) {
   });
 }
 
+const plugRotulosBarraHorizontal = {
+  id: 'rotulosBarraHorizontal',
+  afterDatasetsDraw: function (chart) {
+    const ctx = chart.ctx;
+    const meta = chart.getDatasetMeta(0);
+    const dataset = chart.data.datasets[0];
+    ctx.save();
+    ctx.fillStyle = '#16202B';
+    ctx.font = '700 14px -apple-system, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    meta.data.forEach(function (barra, indice) {
+      const valor = dataset.data[indice];
+      ctx.fillText(String(valor), barra.x + 8, barra.y);
+    });
+    ctx.restore();
+  }
+};
+
 function graficoBarraHorizontal(refVar, canvasId, itens, cor) {
   const ctx = document.getElementById(canvasId).getContext('2d');
   const labels = itens.map(function (i) { return i.nome; });
@@ -874,11 +893,13 @@ function graficoBarraHorizontal(refVar, canvasId, itens, cor) {
         categoryPercentage: 0.7
       }]
     },
+    plugins: [plugRotulosBarraHorizontal],
     options: {
       indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 250 },
+      layout: { padding: { right: 36 } },
       plugins: { legend: { display: false } },
       scales: {
         x: {
