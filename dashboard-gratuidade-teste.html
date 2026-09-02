@@ -81,7 +81,7 @@
 
   .kpis {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 14px;
   }
 
@@ -223,6 +223,10 @@
     <div class="kpi-card">
       <div class="kpi-label">Casos hoje</div>
       <div class="kpi-valor num" id="kpiHoje">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Casos gerais (mês até hoje)</div>
+      <div class="kpi-valor num" id="kpiMes">—</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Origem com mais casos</div>
@@ -391,6 +395,11 @@ function processarDados(dados) {
   const casosUnicos = grupos.length;
   const registrosDuplicados = dados.length;
   const casosHoje = grupos.filter(function (g) { return chaveDia(g.dataViagem) === hoje; }).length;
+  const anoMesAtual = hoje.slice(0, 7);
+  const casosMes = grupos.filter(function (g) {
+    const chave = chaveDia(g.dataViagem);
+    return chave && chave.slice(0, 7) === anoMesAtual && chave <= hoje;
+  }).length;
 
   const porOrigem = contarPorCampo(grupos, 'origem').slice(0, 5);
   const porTipo = contarPorCampo(grupos, 'tipoGratuidade').slice(0, 5);
@@ -409,6 +418,7 @@ function processarDados(dados) {
     casosUnicos: casosUnicos,
     registrosDuplicados: registrosDuplicados,
     casosHoje: casosHoje,
+    casosMes: casosMes,
     porOrigem: porOrigem,
     porTipo: porTipo,
     porLinha: porLinha,
@@ -446,6 +456,7 @@ function contarPorDia(grupos) {
 function renderKPIs(e) {
   document.getElementById('kpiRegistros').textContent = e.registrosDuplicados.toLocaleString('pt-BR');
   document.getElementById('kpiHoje').textContent = e.casosHoje.toLocaleString('pt-BR');
+  document.getElementById('kpiMes').textContent = e.casosMes.toLocaleString('pt-BR');
 
   const topo = e.porOrigem[0];
   document.getElementById('kpiOrigemNome').textContent = topo ? topo.nome : '—';
