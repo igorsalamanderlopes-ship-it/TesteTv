@@ -51,6 +51,12 @@
     position: relative;
   }
 
+  .logo {
+    position: absolute;
+    left: 0;
+    height: 28px;
+  }
+
   .topo h1 {
     font-size: 22px;
     font-weight: 600;
@@ -174,6 +180,12 @@
 
   .col-apertada-direita { padding-right: 2px; }
   .col-apertada-esquerda { padding-left: 2px; }
+  .col-linha {
+    max-width: 240px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   tbody tr:nth-child(even) { background: #F7F9FC; }
 
@@ -206,6 +218,7 @@
   <div id="carregando">Carregando dados...</div>
 
   <div class="topo">
+    <img class="logo" src="data:image/png;base64,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" alt="Logo Guanabara">
     <div>
       <h1>Gratuidade Duplicada</h1>
     </div>
@@ -257,8 +270,9 @@
         <tr>
           <th>Data</th>
           <th>Caso</th>
-          <th class="col-apertada-direita">Linha</th>
+          <th class="col-linha col-apertada-direita">Linha</th>
           <th class="col-apertada-esquerda">Saída do Serviço</th>
+          <th>Regional</th>
           <th>Origem</th>
           <th>Tipo Gratuidade</th>
           <th>Qtd</th>
@@ -297,8 +311,9 @@ const INTERVALO_ATUALIZACAO_MS = 1800000; // 30 minutos, atualização em segund
 
 const CORES = {
   alerta: '#E0492E',
-  teal: '#0E9488',
-  violeta: '#6D54E0',
+  vermelhoEscuro: '#8C2F1B',
+  vermelhoMedio: '#E0492E',
+  vermelhoClaro: '#F2795E',
   textoMuted: '#5B6B7F',
   gradeSutil: '#E1E6EF'
 };
@@ -383,6 +398,7 @@ function agruparPorCaso(dados) {
         caso: chave,
         linha: campo(linha, 'Linha') || '—',
         servico: campo(linha, 'Serviço', 'Servico') || '—',
+        regional: campo(linha, 'Regional') || '—',
         origem: campo(linha, 'Origem') || '—',
         tipoGratuidade: campo(linha, 'Tipo Gratuidade') || '—',
         dataViagem: campo(linha, 'Data Viagem'),
@@ -546,15 +562,15 @@ function graficoBarraHorizontal(refVar, canvasId, itens, cor) {
 }
 
 function renderGraficoOrigem(e) {
-  graficoOrigem = graficoBarraHorizontal(graficoOrigem, 'graficoOrigem', e.porOrigem, CORES.teal);
+  graficoOrigem = graficoBarraHorizontal(graficoOrigem, 'graficoOrigem', e.porOrigem, CORES.vermelhoEscuro);
 }
 
 function renderGraficoTipo(e) {
-  graficoTipo = graficoBarraHorizontal(graficoTipo, 'graficoTipo', e.porTipo, CORES.violeta);
+  graficoTipo = graficoBarraHorizontal(graficoTipo, 'graficoTipo', e.porTipo, CORES.vermelhoMedio);
 }
 
 function renderGraficoLinhas(e) {
-  graficoLinhas = graficoBarraHorizontal(graficoLinhas, 'graficoLinhas', e.porLinha, CORES.alerta);
+  graficoLinhas = graficoBarraHorizontal(graficoLinhas, 'graficoLinhas', e.porLinha, CORES.vermelhoClaro);
 }
 
 function renderGraficoTendencia(e) {
@@ -611,8 +627,9 @@ function renderTabela(e) {
     tr.innerHTML =
       '<td>' + formatarDataCurta(g.dataViagem) + '</td>' +
       '<td>' + g.caso + '</td>' +
-      '<td class="col-apertada-direita">' + g.linha + '</td>' +
+      '<td class="col-linha col-apertada-direita">' + g.linha + '</td>' +
       '<td class="col-apertada-esquerda">' + formatarHoraCurta(g.horaViagem) + '</td>' +
+      '<td>' + g.regional + '</td>' +
       '<td>' + g.origem + '</td>' +
       '<td>' + g.tipoGratuidade + '</td>' +
       '<td class="col-qtd">' + g.qtd + '</td>';
