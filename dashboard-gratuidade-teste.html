@@ -47,7 +47,8 @@
   .topo {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    position: relative;
   }
 
   .topo h1 {
@@ -55,12 +56,7 @@
     font-weight: 600;
     margin: 0;
     letter-spacing: -0.01em;
-  }
-
-  .topo .subtitulo {
-    color: var(--texto-muted);
-    font-size: 13px;
-    margin-top: 2px;
+    text-align: center;
   }
 
   .status {
@@ -69,6 +65,8 @@
     gap: 8px;
     color: var(--texto-muted);
     font-size: 13px;
+    position: absolute;
+    right: 0;
   }
 
   .bolinha {
@@ -81,7 +79,7 @@
 
   .kpis {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 14px;
   }
 
@@ -174,6 +172,9 @@
     border-bottom: 1px solid var(--borda);
   }
 
+  .col-apertada-direita { padding-right: 2px; }
+  .col-apertada-esquerda { padding-left: 2px; }
+
   tbody tr:nth-child(even) { background: #F7F9FC; }
 
   .col-qtd {
@@ -207,7 +208,6 @@
   <div class="topo">
     <div>
       <h1>Gratuidade Duplicada</h1>
-      <div class="subtitulo">Casos com mais de uma gratuidade na mesma viagem</div>
     </div>
     <div class="status">
       <span id="statusBolinha" class="bolinha"></span>
@@ -223,10 +223,6 @@
     <div class="kpi-card">
       <div class="kpi-label">Casos hoje</div>
       <div class="kpi-valor num" id="kpiHoje">—</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Casos gerais (mês até hoje)</div>
-      <div class="kpi-valor num" id="kpiMes">—</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Origem com mais casos</div>
@@ -259,12 +255,12 @@
     <table>
       <thead>
         <tr>
+          <th>Data</th>
           <th>Caso</th>
-          <th>Linha</th>
-          <th>Hora</th>
+          <th class="col-apertada-direita">Linha</th>
+          <th class="col-apertada-esquerda">Saída do Serviço</th>
           <th>Origem</th>
           <th>Tipo Gratuidade</th>
-          <th>Data</th>
           <th>Qtd</th>
         </tr>
       </thead>
@@ -456,7 +452,6 @@ function contarPorDia(grupos) {
 function renderKPIs(e) {
   document.getElementById('kpiRegistros').textContent = e.registrosDuplicados.toLocaleString('pt-BR');
   document.getElementById('kpiHoje').textContent = e.casosHoje.toLocaleString('pt-BR');
-  document.getElementById('kpiMes').textContent = e.casosMes.toLocaleString('pt-BR');
 
   const topo = e.porOrigem[0];
   document.getElementById('kpiOrigemNome').textContent = topo ? topo.nome : '—';
@@ -571,12 +566,12 @@ function renderTabela(e) {
   e.tabela.forEach(function (g) {
     const tr = document.createElement('tr');
     tr.innerHTML =
+      '<td>' + formatarDataCurta(g.dataViagem) + '</td>' +
       '<td>' + g.caso + '</td>' +
-      '<td>' + g.linha + '</td>' +
-      '<td>' + formatarHoraCurta(g.horaViagem) + '</td>' +
+      '<td class="col-apertada-direita">' + g.linha + '</td>' +
+      '<td class="col-apertada-esquerda">' + formatarHoraCurta(g.horaViagem) + '</td>' +
       '<td>' + g.origem + '</td>' +
       '<td>' + g.tipoGratuidade + '</td>' +
-      '<td>' + formatarDataCurta(g.dataViagem) + '</td>' +
       '<td class="col-qtd">' + g.qtd + '</td>';
     corpo.appendChild(tr);
   });
