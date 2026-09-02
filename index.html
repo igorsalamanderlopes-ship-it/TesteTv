@@ -47,7 +47,7 @@
   .topo {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     position: relative;
   }
 
@@ -61,8 +61,10 @@
     font-size: 27px;
     font-weight: 600;
     margin: 0;
+    margin-left: 130px;
     letter-spacing: -0.01em;
-    text-align: center;
+    text-align: left;
+    color: var(--azul-marca);
   }
 
   .status {
@@ -726,7 +728,7 @@ function calcularProximosCasos(grupos) {
       const minutosB = minutosDaHora(b.horaViagem) || 0;
       return minutosA - minutosB;
     })
-    .slice(0, 15);
+    .slice(0, 30);
 }
 
 function contarPorCampo(grupos, campoNome) {
@@ -784,7 +786,7 @@ function graficoDonut(refVar, canvasId, itens) {
   const ctx = document.getElementById(canvasId).getContext('2d');
   const labels = itens.map(function (i) { return i.nome; });
   const valores = itens.map(function (i) { return i.total; });
-  const rampaVermelha = ['#7A0C0C', '#B71C1C', '#E53935', '#FF6659', '#FF8A80', '#FFCDD2'];
+  const paletaVariada = ['#3B82F6', '#F59E0B', '#10B981', '#8B5CF6', '#EC4899', '#14B8A6'];
 
   if (refVar) {
     refVar.data.labels = labels;
@@ -799,7 +801,7 @@ function graficoDonut(refVar, canvasId, itens) {
       labels: labels,
       datasets: [{
         data: valores,
-        backgroundColor: rampaVermelha.slice(0, valores.length),
+        backgroundColor: paletaVariada.slice(0, valores.length),
         borderColor: '#FFFFFF',
         borderWidth: 2
       }]
@@ -809,7 +811,7 @@ function graficoDonut(refVar, canvasId, itens) {
       maintainAspectRatio: false,
       animation: { duration: 250 },
       plugins: {
-        legend: { display: true, position: 'right', labels: { font: { size: 12 }, color: '#16202B', boxWidth: 12 } }
+        legend: { display: true, position: 'right', labels: { font: { size: 15, weight: '600' }, color: '#16202B', boxWidth: 18, padding: 14 } }
       }
     }
   });
