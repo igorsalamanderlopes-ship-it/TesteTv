@@ -11,8 +11,7 @@
     --texto-principal: #16202B;
     --texto-muted: #5B6B7F;
     --alerta: #E0492E;
-    --teal: #0E9488;
-    --violeta: #6D54E0;
+    --azul-marca: #518AD7;
     --borda: #E1E6EF;
   }
 
@@ -54,7 +53,7 @@
   .logo {
     position: absolute;
     left: 0;
-    height: 28px;
+    height: 44px;
   }
 
   .topo h1 {
@@ -92,6 +91,7 @@
   .kpi-card {
     background: var(--bg-painel);
     border: 1px solid var(--borda);
+    border-top: 4px solid var(--azul-marca);
     border-radius: 10px;
     padding: 14px 18px;
   }
@@ -139,7 +139,7 @@
     font-size: 13px;
     font-weight: 600;
     margin: 0 0 8px 0;
-    color: var(--texto-principal);
+    color: var(--azul-marca);
   }
 
   .grafico-canvas-wrap { flex: 1; min-height: 0; position: relative; }
@@ -156,6 +156,7 @@
     font-size: 13px;
     font-weight: 600;
     margin: 0 0 8px 0;
+    color: var(--azul-marca);
   }
 
   table {
@@ -573,6 +574,25 @@ function renderGraficoLinhas(e) {
   graficoLinhas = graficoBarraHorizontal(graficoLinhas, 'graficoLinhas', e.porLinha, CORES.vermelhoClaro);
 }
 
+const plugRotulosPonto = {
+  id: 'rotulosPonto',
+  afterDatasetsDraw: function (chart) {
+    const ctx = chart.ctx;
+    const dataset = chart.data.datasets[0];
+    const meta = chart.getDatasetMeta(0);
+    ctx.save();
+    ctx.fillStyle = CORES.alerta;
+    ctx.font = '600 12px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    meta.data.forEach(function (ponto, indice) {
+      const valor = dataset.data[indice];
+      ctx.fillText(String(valor), ponto.x, ponto.y - 8);
+    });
+    ctx.restore();
+  }
+};
+
 function renderGraficoTendencia(e) {
   const ctx = document.getElementById('graficoTendencia').getContext('2d');
   const labels = e.porDia.map(function (p) { return formatarDataCurta(p.dia + 'T00:00:00'); });
@@ -599,9 +619,11 @@ function renderGraficoTendencia(e) {
         pointBackgroundColor: CORES.alerta
       }]
     },
+    plugins: [plugRotulosPonto],
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: { top: 20 } },
       animation: { duration: 250 },
       plugins: { legend: { display: false } },
       scales: {
