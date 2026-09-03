@@ -227,18 +227,21 @@
 
   table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     font-size: 18px;
   }
 
-  thead tr { background: #2E5A8F; }
-
   thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     text-align: center;
     color: #FFFFFF;
     font-weight: 700;
     font-size: 20px;
     padding: 10px 12px;
+    background: #2E5A8F;
     border-bottom: none;
   }
 
